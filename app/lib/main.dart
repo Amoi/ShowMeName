@@ -8,17 +8,14 @@ import 'service/baidu_recognize.dart';
 
 void main() => runApp(new MyApp());
 
-class IMAGE_TYPE {
-  static const CAR = 0;
-  static const PLANT = 1;
-}
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ShowMeName',
       theme: new ThemeData(
         // This is the theme of your application.
         //
@@ -56,7 +53,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _childButtons = List<UnicornButton>();
   String _imagePath;
-  int _currentType;
   String _result;
 
   _MyHomePageState() {
@@ -72,13 +68,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   new MaterialPageRoute(
                       builder: (BuildContext context) => CameraApp()))
               .then((imagePath) {
-            fetchPlantResult(imagePath).then((entity) {
-              print(entity.result.first);
-              setState(() {
-                _currentType = IMAGE_TYPE.CAR;
-                _imagePath = imagePath;
-                _result = entity.result.first.name;
-              });
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => Dialog(
+                child: Container(
+                  height: 100.0,
+                  width: 80.0,
+                  alignment: Alignment.center,
+                  child:  new Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      new CircularProgressIndicator(),
+                      SizedBox(
+                        height: 12.0,
+                      ),
+                      new Text("Loading"),
+                    ],
+                  ),
+                ),
+              ),
+            );
+            fetchCarResult(imagePath).then((entity) {
+              Navigator.pop(context);
+              if (entity != null) {
+                print(entity.result.first);
+                setState(() {
+                  _imagePath = imagePath;
+                  _result = entity.result.first.name;
+                });
+              }
             });
           });
         },
@@ -96,17 +115,84 @@ class _MyHomePageState extends State<MyHomePage> {
                     new MaterialPageRoute(
                         builder: (BuildContext context) => CameraApp()))
                 .then((imagePath) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) => Dialog(
+                  child: Container(
+                    height: 100.0,
+                    width: 80.0,
+                    alignment: Alignment.center,
+                    child:  new Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        new CircularProgressIndicator(),
+                        SizedBox(
+                          height: 12.0,
+                        ),
+                        new Text("Loading"),
+                      ],
+                    ),
+                  ),
+                ),
+              );
               fetchPlantResult(imagePath).then((entity) {
-                print(entity.result.first);
-                setState(() {
-                  _currentType = IMAGE_TYPE.CAR;
-                  _imagePath = imagePath;
-                  _result = entity.result.first.name;
-                });
+                Navigator.pop(context);
+                if (entity != null) {
+                  print(entity.result.first);
+                  setState(() {
+                    _imagePath = imagePath;
+                    _result = entity.result.first.name;
+                  });
+                }
               });
             });
           }),
     ));
+    _childButtons.add(UnicornButton(
+        label: Chip(label: Text("食物")),
+        currentButton: FloatingActionButton(
+            heroTag: 'dish',
+            child: Icon(Icons.restaurant),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => CameraApp()))
+              .then( (imagePath) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) => Dialog(
+                    child: Container(
+                      height: 100.0,
+                      width: 80.0,
+                      alignment: Alignment.center,
+                      child:  new Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          new CircularProgressIndicator(),
+                          SizedBox(
+                            height: 12.0,
+                          ),
+                          new Text("Loading"),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+                fetchDishResult(imagePath).then((entity) {
+                  Navigator.pop(context);
+                  if (entity != null) {
+                    print(entity.result.first);
+                    setState(() {
+                      _imagePath = imagePath;
+                      _result = entity.result.first.name;
+                    });
+                  }
+                });
+              });
+            })));
   }
 
   @override
