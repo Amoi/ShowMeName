@@ -12,6 +12,7 @@ dependencies:
   json_annotation: ^0.2.3
   unicorndial: ^1.0.9
   camera: ^0.2.1
+  shared_preferences: ^0.4.2
 
 dev_dependencies:
   flutter_test:
